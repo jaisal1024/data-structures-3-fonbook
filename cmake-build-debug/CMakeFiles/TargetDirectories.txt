@@ -1,0 +1,3 @@
+/Users/37138/Desktop/Google Drive/NYUAD 21/Data Structures/Hw&Projects/project3/data-structures-3-fonbook/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/37138/Desktop/Google Drive/NYUAD 21/Data Structures/Hw&Projects/project3/data-structures-3-fonbook/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/37138/Desktop/Google Drive/NYUAD 21/Data Structures/Hw&Projects/project3/data-structures-3-fonbook/cmake-build-debug/CMakeFiles/data_structures_3_fonbook.dir
