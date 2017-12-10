@@ -6,7 +6,6 @@
 #define DATA_STRUCTURES_3_FONBOOK_HASHDIRECTORY_H
 
 #include <string>
-#include <list>
 #include "Entry.h"
 
 using namespace std;
@@ -15,7 +14,7 @@ class HashDirectory {
 private:
     double loadFactor = 0.75;
     int capacity = 10, size = 0, threshold = (int)(capacity * loadFactor);
-    list<Entry> hashArray [];
+    Entry hashArray[];
 
 public:
     HashDirectory();
@@ -24,12 +23,14 @@ public:
 
 private:
     void resizeArray();
-    int computeIndexHash(int entryHash);
+    int find_index_insertion(string key);
+    int find_index_search(string key);
+    int computeHash(string key);
 
 public:
     bool isEmpty() {return size==0;};
     bool remove(string key);
-    bool insert(Entry entryIn);
+    bool insert(Entry &entryIn);
     string find(string key);
     void printTable();
     void printStats();
