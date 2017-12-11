@@ -14,7 +14,7 @@ class HashDirectory {
 private:
     double loadFactor = 0.75;
     int capacity = 10, size = 0, threshold = (int)(capacity * loadFactor);
-    Entry hashArray[];
+    Entry *hashArray;
 
 public:
     HashDirectory();
@@ -30,7 +30,7 @@ private:
 public:
     bool isEmpty() {return size==0;};
     bool remove(string key);
-    bool insert(Entry &entryIn);
+    bool insert(Entry* entryIn);
     string find(string key);
     void printTable();
     void printStats();

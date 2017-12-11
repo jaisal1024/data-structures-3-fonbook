@@ -5,8 +5,8 @@
 #include "Entry.h"
 
 Entry::Entry() {
-    value = NULL;
-    key = NULL;
+    value = "";
+    key = "";
     hash = -1;
 }
 Entry::Entry(string valueIn) {
@@ -50,8 +50,8 @@ const string &Entry::getKey() const {
 }
 
 void Entry::clear(){
-    value = NULL;
-    key = NULL;
+    value = "";
+    key = "";
     hash = -1;
 }
 

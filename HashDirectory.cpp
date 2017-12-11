@@ -70,13 +70,13 @@ int HashDirectory::find_index_search(string key) {
     return -1;
 }
 
-bool HashDirectory::insert(Entry &entryIn) {
-    int index = find_index_insertion(entryIn.getKey());
+bool HashDirectory::insert(Entry* entryIn) {
+    int index = find_index_insertion(entryIn->getKey());
     if (index == -1) {
         resizeArray();
         return false;
     }
-    hashArray[index] = entryIn;
+    hashArray[index] = *entryIn;
     return true;
 }
 bool HashDirectory::remove(string key) {
