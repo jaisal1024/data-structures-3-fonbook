@@ -17,7 +17,13 @@ private:
     int hash;
     int computeHash();
 public:
-    Entry(string key, string value);
+    Entry();
+    Entry(string value);
+    const string &getKey() const;
+    const string &getValue() const;
+    int getHash();
+    bool empty();
+    void clear();
 
     friend class HashDirectory;
 

@@ -1,0 +1,44 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/37138/Desktop/Google Drive/NYUAD 21/Data Structures/Hw&Projects/project3/data-structures-3-fonbook/Entry.cpp
+Entry.h
+/Users/37138/Desktop/Google Drive/NYUAD 21/Data Structures/Hw&Projects/project3/data-structures-3-fonbook/Entry.h
+
+/Users/37138/Desktop/Google Drive/NYUAD 21/Data Structures/Hw&Projects/project3/data-structures-3-fonbook/Entry.h
+string
+-
+
+/Users/37138/Desktop/Google Drive/NYUAD 21/Data Structures/Hw&Projects/project3/data-structures-3-fonbook/HashDirectory.cpp
+HashDirectory.h
+/Users/37138/Desktop/Google Drive/NYUAD 21/Data Structures/Hw&Projects/project3/data-structures-3-fonbook/HashDirectory.h
+
+/Users/37138/Desktop/Google Drive/NYUAD 21/Data Structures/Hw&Projects/project3/data-structures-3-fonbook/HashDirectory.h
+string
+-
+Entry.h
+/Users/37138/Desktop/Google Drive/NYUAD 21/Data Structures/Hw&Projects/project3/data-structures-3-fonbook/Entry.h
+cmath
+/Users/37138/Desktop/Google Drive/NYUAD 21/Data Structures/Hw&Projects/project3/data-structures-3-fonbook/cmath
+iostream
+-
+
+/Users/37138/Desktop/Google Drive/NYUAD 21/Data Structures/Hw&Projects/project3/data-structures-3-fonbook/fonbook.cpp
+cstdlib
+-
+fstream
+-
+string
+-
+iostream
+-
+Entry.h
+/Users/37138/Desktop/Google Drive/NYUAD 21/Data Structures/Hw&Projects/project3/data-structures-3-fonbook/Entry.h
+HashDirectory.h
+/Users/37138/Desktop/Google Drive/NYUAD 21/Data Structures/Hw&Projects/project3/data-structures-3-fonbook/HashDirectory.h
+
