@@ -9,7 +9,7 @@
 #include "HashDirectory.h"
 
 HashDirectory* init(int entrySize, int bucketSize){
-    HashDirectory* hashPtr = new HashDirectory(entrySize);
+    HashDirectory* hashPtr = new HashDirectory(entrySize, bucketSize);
     return hashPtr;
 }
 bool add(string value, HashDirectory* hashDirectory) {
@@ -22,21 +22,26 @@ string find(string key, HashDirectory* hashDirectory) {
 bool deleteE(string key, HashDirectory* hashDirectory) {
     return hashDirectory->remove(key);
 }
-bool load(string file, HashDirectory* hashDirectory) {
+bool load(const char* file, HashDirectory* hashDirectory) {
     string input;
-
+    bool opened = false;
     //Define and open input stream
     ifstream textFile(file);
     if (textFile.is_open()) {
+        opened = true;
         while (getline(textFile, input)) { //get each line of the txt file
+            cout << input << endl;
             Entry* entry = new Entry(input);
             hashDirectory->insert(entry);
         }
     }
     textFile.close();
-    return true;
+    if (opened)
+        return true;
+    cerr << "Error: " << strerror(errno);
+    return false;
 }
-bool dump(string file, HashDirectory* hashDirectory) {
+bool dump(const char* file, HashDirectory* hashDirectory) {
     return true;
 }
 
@@ -48,7 +53,7 @@ int main(int argc, char* argv[]) {
     int bucketIndex = -1;
     int fileIndex = -1;
     bool fileGiven = false;
-    string fileName;
+    const char* fileName;
 
     //check if you are given at least 4 terminal inputs
     if (argc < 4) {
@@ -77,9 +82,9 @@ int main(int argc, char* argv[]) {
         return -1;
     }
     if (fileIndex != -1) {
-        fileName = (argv[fileIndex]);
+        fileName = argv[fileIndex];
         fileGiven = true;
-
+        cout << fileName << endl;
     }
 
 
@@ -113,10 +118,10 @@ int main(int argc, char* argv[]) {
                 if (deleteE(input.substr(6,input.length() -5), hashDirectory))
                     cout << "Delete successful" << endl;
             } else if (input.substr(0,4) == "load") {
-                if (load(input.substr(5,input.length() -4), hashDirectory))
+                //if (load(input.substr(5,input.length() -4), hashDirectory))
                     cout << "Load successful" << endl;
             } else if (input.substr(0,4) == "dump") {
-                if (dump(input.substr(5,input.length() -4), hashDirectory))
+                //if (dump(input.substr(5,input.length() -4), hashDirectory))
                     cout << "Dump successful" << endl;
             } else if (input.substr(0,4) == "prin") {
 

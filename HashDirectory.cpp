@@ -5,15 +5,32 @@
 #include "HashDirectory.h"
 
 HashDirectory::HashDirectory() {
-    hashArray = new Entry[capacity];
+    hashArray = new Buckets[capacity];
 }
 
-HashDirectory::HashDirectory(int capacityIn) {
+HashDirectory::HashDirectory(int capacityIn, int bucketSizeIn) {
     if (capacityIn > capacity)
         capacity = capacityIn;
-    hashArray = new Entry[capacity];
-    threshold = (int)(capacity*loadFactor);
+    else {
+        //compute smallest prime number greater than capacityIn
+        while (!is_prime(capacityIn)) {
+            capacityIn++;    // you want to find a prime number greater than the argument
+        }
+        capacity = capacityIn;
+    }
+    hashArray = new Buckets[capacity];
+    bucketSize = bucketSizeIn;
 
+}
+
+bool HashDirectory::is_prime(int num) {
+    int sq_root = (int)sqrt(num);
+    for (int i = 2; i <= sq_root; i++) {
+        if (num % i == 0) {
+            return false;
+        }
+        return true;
+    }
 }
 
 HashDirectory::~HashDirectory() {
@@ -39,61 +56,81 @@ int HashDirectory::computeHash(string key) {
     return hashCode;
 }
 
-void HashDirectory::resizeArray(){
 
-}
-
-int HashDirectory::find_index_insertion(string key) {
-   int h = computeHash(key) % capacity, offset = 0, index;
-
-    while (offset < capacity) {
-        index = (h + offset) % capacity;
-        // empty index for new entry with key `key`
-        if (hashArray[index].empty())
-            return index;
-        else if (hashArray[index].getKey() == key) //found duplicate
-            return -1;
-        offset++;
-    }
-    return -1;
-}
-int HashDirectory::find_index_search(string key) {
-    int h = computeHash(key) % capacity, offset = 0, index;
-
-    while (offset < capacity) {
-        index = (h + offset) % capacity;
-        // empty index for new entry with key `key`
-        if (hashArray[index].getKey() == key) //found duplicate in search
-            return index;
-        offset++;
-    }
-    return -1;
+int HashDirectory::find_index(string key) {
+   int h = computeHash(key) % capacity;
+    return h;
 }
 
 bool HashDirectory::insert(Entry* entryIn) {
-    int index = find_index_insertion(entryIn->getKey());
+    int index = find_index(entryIn->getKey());
     if (index == -1) {
-        resizeArray();
         return false;
     }
-    hashArray[index] = *entryIn;
-    return true;
+    return hashArray[index].insert(entryIn);
 }
 bool HashDirectory::remove(string key) {
-    int index = find_index_search(key);
+    int index = find_index(key);
     if (index == -1)
         return false;
 
-    hashArray[index].clear();
-    return true;
+    return hashArray[index].remove(key);
 }
 string HashDirectory::find(string key) {
-    int index = find_index_search(key);
+    int index = find_index(key);
     if (index == -1)
         return "";
 
-    return hashArray[index].getValue();
+    return hashArray[index].find(key);
 
 }
-void HashDirectory::printTable() {}
+void HashDirectory::printTable() {
+
+}
 void HashDirectory::printStats() {}
+
+
+Buckets::Buckets() {
+    bucketArray = new Entry[5];
+    nextChain = NULL;
+    index = 0;
+    isFull = false;
+    bucketSize = 5;
+}
+Buckets::Buckets(int bucketSizeIn) {
+    bucketArray = new Entry[bucketSizeIn];
+    nextChain = NULL;
+    index = 0;
+    isFull = false;
+    bucketSize = bucketSizeIn;
+}
+Buckets::~Buckets() {
+    delete [] bucketArray;
+    Buckets* bucketNext = nextChain;
+    while(bucketNext!= NULL){
+        Buckets* bucketCurr = nextChain;
+        bucketNext = bucketCurr->nextChain;
+        delete bucketCurr;
+    }
+}
+
+bool Buckets::insert(Entry* entryIn){
+    if (!isFull) {
+        bucketArray[index++] = *entryIn;
+        if (index == bucketSize) {
+            Buckets* nextBucket = new Buckets(bucketSize);
+            nextChain = nextBucket;
+            isFull = true;
+        }
+        cout << "INSERTED :" << entryIn->getValue() << endl;
+        return true;
+    }
+    else if (nextChain!=NULL) {
+       nextChain->insert(entryIn);
+    }
+    return false;
+}
+string Buckets::find(string key){}
+bool Buckets::remove(string key){}
+bool Buckets::isEmpty(){ return index ==0;}
+int Buckets::getIndex(){ return index;}

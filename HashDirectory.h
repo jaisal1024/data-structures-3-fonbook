@@ -7,25 +7,50 @@
 
 #include <string>
 #include "Entry.h"
+#include "cmath"
+#include <iostream>
 
 using namespace std;
 
+class Buckets {
+protected:
+    Entry *bucketArray;
+    Buckets* nextChain;
+    int index;
+    bool isFull;
+    int bucketSize;
+
+public:
+    Buckets();
+    Buckets(int bucketSize);
+    ~Buckets();
+
+protected:
+
+    string find(string key);
+    bool remove(string key);
+    bool insert(Entry* entryIn);
+    bool isEmpty();
+    int getIndex();
+
+    friend class HashDirectory;
+};
+
 class HashDirectory {
 private:
-    double loadFactor = 0.75;
-    int capacity = 10, size = 0, threshold = (int)(capacity * loadFactor);
-    Entry *hashArray;
+    double loadFactor = 0;
+    int capacity = 7, size = 0, bucketSize = 0;
+    Buckets* hashArray;
 
 public:
     HashDirectory();
-    HashDirectory(int capacity);
+    HashDirectory(int capacity, int bucketSize);
     virtual ~HashDirectory();
 
 private:
-    void resizeArray();
-    int find_index_insertion(string key);
-    int find_index_search(string key);
+    int find_index(string key);
     int computeHash(string key);
+    bool is_prime(int num);
 
 public:
     bool isEmpty() {return size==0;};
@@ -35,6 +60,8 @@ public:
     void printTable();
     void printStats();
 };
+
+
 
 
 #endif //DATA_STRUCTURES_3_FONBOOK_HASHDIRECTORY_H

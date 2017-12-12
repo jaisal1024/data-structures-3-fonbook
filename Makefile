@@ -1,23 +1,19 @@
-output: myCalc.o BinaryTree.o HelperLibrary.o Token.o
-	g++ myCalc.o BinaryTree.o HelperLibrary.o Token.o -o output
-	./output -i file2.txt
+output: fonbook.o HashDirectory.o Entry.o
+	g++ fonbook.o HashDirectory.o Entry.o
+	./output -n 20 -b 5 -f file1.txt
 
-myCalc.o: myCalc.cpp
-	g++ -c myCalc.cpp
+fonbook.o: fonbook.cpp
+	g++ -c fonbook.cpp
 
-Token.o:  Token.cpp Token.h
-	g++ -c Token.cpp
+HashDirectory.o:  HashDirectory.cpp HashDirectory.h
+	g++ -c HashDirectory.cpp
 
-BinaryTree.o: BinaryTree.cpp BinaryTree.h
-	g++ -c BinaryTree.cpp
-
-HelperLibrary.o:  HelperLibrary.cpp HelperLibrary.h
-	g++ -c HelperLibrary.cpp
+Entry.o: Entry.cpp Entry.h
+	g++ -c Entry.cpp
 
 
 clean:
-	rm -f 	myCalc.o \
-		BinaryTree.o \
-		HelperLibrary.o \
-		Token.o \
+	rm -f 	fonbook.o \
+		Entry.o \
+		HashDirectory.o \
 		output
