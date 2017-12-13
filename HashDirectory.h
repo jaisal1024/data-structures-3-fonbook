@@ -9,6 +9,7 @@
 #include "Entry.h"
 #include "cmath"
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 
@@ -26,20 +27,20 @@ public:
     ~Buckets();
 
 protected:
-
     string find(string key);
     bool remove(string key);
     bool insert(Entry* entryIn);
     bool isEmpty();
     int getIndex();
+    void printBucket();
 
     friend class HashDirectory;
 };
 
 class HashDirectory {
 private:
-    double loadFactor = 0;
-    int capacity = 7, size = 0, bucketSize = 0;
+    double loadFactor;
+    int capacity, size, bucketSize;
     Buckets* hashArray;
 
 public:

@@ -7,6 +7,7 @@
 #define DATA_STRUCTURES_3_FONBOOK_ENTRY_H
 
 #include <string>
+#include <iostream>
 using namespace std;
 
 
