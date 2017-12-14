@@ -10,6 +10,8 @@
 #include "cmath"
 #include <iostream>
 #include <iomanip>
+#include <fstream>
+#include <vector>
 
 using namespace std;
 
@@ -34,6 +36,7 @@ protected:
     bool isEmpty();
     int getIndex();
     void printBucket();
+    void getBucketContents(vector<string>& contentBuckets);
 
 private:
     bool refactorOnRemove(int i);
@@ -64,6 +67,7 @@ public:
     string find(string key);
     void printTable();
     void printStats();
+    bool dump(const char*);
 };
 
 

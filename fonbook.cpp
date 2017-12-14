@@ -47,10 +47,10 @@ void load(const char* fileName, HashDirectory* hashDirectory) {
         cerr << "Error: " << strerror(errno);
 }
 void dump(const char* file, HashDirectory* hashDirectory) {
-    ofstream textFile;
-    textFile.open(file);
-    if (textFile.is_open()) {
-    }
+    if (hashDirectory->dump(file))
+        cout << "Dump successful to " << file << endl;
+    else
+        cout << "Dump unsuccessful to " << file << " Check your path to file f" << endl;
 }
 
 

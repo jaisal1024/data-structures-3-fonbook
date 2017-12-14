@@ -112,6 +112,34 @@ void HashDirectory::printTable() {
 }
 void HashDirectory::printStats() {}
 
+bool HashDirectory::dump(const char* fileName) {
+    if (isEmpty()){
+        cout << "Hash Directory is empty, there is nothing to dump to the file " << fileName  << endl;
+        return false;
+    }
+    bool opened = false;
+    ofstream textFile;
+    textFile.open(fileName, ios::out);
+    if (textFile.is_open()){
+        opened = true;
+        for (int i = 0; i < capacity; ++i) {
+            if (hashArray[i].isEmpty())
+                continue;
+            else {
+                vector<string> bucketContents;
+                hashArray[i].getBucketContents(bucketContents);
+                for (int j = 0; j < bucketContents.size(); ++j) {
+                    textFile << bucketContents.at(j) << endl;
+                }
+            }
+
+        }
+
+    }
+    textFile.close();
+    return opened;
+}
+
 
 Buckets::Buckets() {
     bucketArray = new Entry[5];
@@ -225,6 +253,16 @@ void Buckets::printBucket() {
     }
     for (int i = 0; i < index; i++) {
         cout << setw(10) << bucketArray[i].getValue()  << endl;
+    }
+    if (isFull)
+        nextChain->printBucket();
+}
+void Buckets::getBucketContents(vector<string> & bucketContents) {
+    if (index == 0) {
+        return;
+    }
+    for (int i = 0; i < index; i++) {
+        bucketContents.push_back(bucketArray[i].getValue());
     }
     if (isFull)
         nextChain->printBucket();
