@@ -17,6 +17,7 @@ class Buckets {
 protected:
     Entry *bucketArray;
     Buckets* nextChain;
+    Buckets* prevChain;
     int index;
     bool isFull;
     int bucketSize;
@@ -33,6 +34,9 @@ protected:
     bool isEmpty();
     int getIndex();
     void printBucket();
+
+private:
+    bool refactorOnRemove(int i);
 
     friend class HashDirectory;
 };

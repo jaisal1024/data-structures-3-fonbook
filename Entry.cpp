@@ -21,8 +21,10 @@ Entry::Entry(string valueIn) {
         } else if (valueIn.substr(i,1) == " " && foundWhiteSpaceOne && !foundWhiteSpaceTwo) {
             key = key + valueIn.substr(indexLastName, i - indexLastName);
             foundWhiteSpaceTwo = true;
-        } else if (foundWhiteSpaceTwo)
+        } else if (foundWhiteSpaceTwo) {
             break;
+        }
+         continue;
     }
     hash = computeHash();
 }
@@ -42,8 +44,6 @@ int Entry::computeHash() {
         hashCode += (j+1)*c;
 
     }
-    if (key == "ShanteMark")
-        cout << "SHANTE MARK HASH: " << hashCode << endl;
     return hashCode;
 }
 int Entry::getHash() {

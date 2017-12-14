@@ -86,16 +86,14 @@ bool HashDirectory::insert(Entry* entryIn) {
 }
 bool HashDirectory::remove(string key) {
     int index = find_index(key);
-    if (index == -1)
+    if (index == -1 || hashArray[index].isEmpty()) {
+        cerr << "Search for " << key << " not found - Remove not possible" << endl;
         return false;
-
+    }
     return hashArray[index].remove(key);
 }
 string HashDirectory::find(string key) {
-    cout << key << endl;
     int index = find_index(key);
-    cout << index << endl;
-    hashArray[index].printBucket();
     if (index == -1 || hashArray[index].isEmpty()) {
         cerr << "Search for " << key << " not found" << endl;
         return "";
@@ -118,6 +116,7 @@ void HashDirectory::printStats() {}
 Buckets::Buckets() {
     bucketArray = new Entry[5];
     nextChain = NULL;
+    prevChain = NULL;
     index = 0;
     isFull = false;
     bucketSize = 5;
@@ -125,6 +124,7 @@ Buckets::Buckets() {
 Buckets::Buckets(int bucketSizeIn) {
     bucketArray = new Entry[bucketSizeIn];
     nextChain = NULL;
+    prevChain = NULL;
     index = 0;
     isFull = false;
     bucketSize = bucketSizeIn;
@@ -137,31 +137,40 @@ Buckets::~Buckets() {
         bucketNext = bucketCurr->nextChain;
         delete bucketCurr;
     }
+    delete prevChain;
 }
 
 bool Buckets::insert(Entry* entryIn){
+    //check it's not defined within the bucket already
+    for (int i = 0; i < index; i++) {
+        if (bucketArray[i].getValue().compare(entryIn->getValue()) == 0){
+            cerr << "Warning: Cannot insert already defined entry" << endl;
+            return false;
+
+        }
+    }
     if (!isFull) {
-        cout << entryIn->getKey()<< " NOT FULL" << endl;
         bucketArray[index++] = *entryIn;
         if (index == bucketSize) {
+            cout << "Create: bucket chain " << endl;
             Buckets* nextBucket = new Buckets(bucketSize);
             nextChain = nextBucket;
+            nextBucket->prevChain = this;
             isFull = true;
         }
         return true;
     }
     else if (nextChain!=NULL) {
        nextChain->insert(entryIn);
-    }
-    return false;
+    } else
+        return false;
 }
 string Buckets::find(string key){
     bool found = false;
     for (int i = 0; i < index && !found; i++) {
-        if (bucketArray[index].getKey() == key) {
+        if (bucketArray[i].getKey().compare(key)==0) {
             found = true;
-            cout << bucketArray[index].getValue() << endl;
-            return bucketArray[index].getValue();
+            return bucketArray[i].getValue();
         }
     }
     if ((found == false && !isFull)) {
@@ -172,7 +181,42 @@ string Buckets::find(string key){
         return nextChain->find(key);
     }
 }
-bool Buckets::remove(string key){}
+bool Buckets::remove(string key){
+    for (int i = 0; i < index; i++) {
+        if (bucketArray[i].getKey().compare(key)==0) {
+            cout << "Removed successfully : " << bucketArray[i].getValue() << endl;
+            return refactorOnRemove(i);
+        }
+    }
+    if (!isFull) {
+        cerr << "Search for " << key << " not found - Remove not possible" << endl;
+        return false;
+    } else {
+        return nextChain->remove(key);
+    }
+}
+bool Buckets::refactorOnRemove(int i) {
+    if (i < bucketSize -1){
+        if (i == index-1) //if the found element is the last in the bucketArray
+            index--;
+        else { //shift bucketArray to accommodate remove function
+            for (int j = i; j < bucketSize - 1; ++j) {
+                if (bucketArray[j + 1].getKey().length() != 0) {
+                    bucketArray[j] = bucketArray[j + 1];
+                } else {
+                    break;
+                }
+            }
+            index--;
+        }
+        return true;
+    } else if (i == bucketSize -1){
+        index--;
+        isFull = false;
+        return true;
+    } else
+        return false;
+}
 bool Buckets::isEmpty(){ return index ==0;}
 int Buckets::getIndex(){ return index;}
 void Buckets::printBucket() {
@@ -185,3 +229,4 @@ void Buckets::printBucket() {
     if (isFull)
         nextChain->printBucket();
 }
+

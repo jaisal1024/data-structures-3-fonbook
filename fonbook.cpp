@@ -24,10 +24,7 @@ void find(string key, HashDirectory* hashDirectory) {
     cout << hashDirectory->find(key);
 }
 void deleteE(string key, HashDirectory* hashDirectory) {
-    if (hashDirectory->remove(key))
-        cout << "Delete successful" << endl;
-    else
-        cout << "Delete unsuccessful" << endl;
+    hashDirectory->remove(key);
 }
 void load(const char* fileName, HashDirectory* hashDirectory) {
     string input;
@@ -45,12 +42,15 @@ void load(const char* fileName, HashDirectory* hashDirectory) {
     }
     textFile.close();
     if (opened)
-        cout << 'File loaded successfully' << endl;
+        cout << "File loaded successfully" << endl;
     else
         cerr << "Error: " << strerror(errno);
 }
 void dump(const char* file, HashDirectory* hashDirectory) {
-
+    ofstream textFile;
+    textFile.open(file);
+    if (textFile.is_open()) {
+    }
 }
 
 
@@ -114,9 +114,11 @@ int main(int argc, char* argv[]) {
         if (input == "init" ) {
             if (!initRun) {
                 hashDirectory = init(entryIndex, bucketIndex);
+                initRun = true;
+                cout << "Hash Directory Initialized" << endl;
+            } else {
+                cout << "Main Memory Hash Directory already initialized" << endl;
             }
-            cout << "Main Memory Hash Directory already initialized" << endl;
-            initRun = true;
         } else if (input == "quit") {
             hashDirectory->~HashDirectory();
             run = false;
@@ -130,16 +132,20 @@ int main(int argc, char* argv[]) {
             }
             cin >> classifier;
             if (input == "add" && classifier.length() > 0) {
+                string temp;
+                for (int i = 0; i < 6; ++i) {
+                    cin >> temp;
+                    classifier = classifier + " " + temp;
+                }
                 add(classifier, hashDirectory);
             } else if (input == "find" && classifier.length() > 0) {
                 find(classifier, hashDirectory);
             } else if (input == "delete" && classifier.length() > 0) {
                 deleteE(classifier, hashDirectory);
             } else if (input == "load" && classifier.length() > 0) {
-                // string to const char *
-                //load(classifier, hashDirectory);
+                load(classifier.c_str(), hashDirectory);
             } else if (input == "dump" && classifier.length() > 0) {
-                //dump(classifier, hashDirectory);
+                dump(classifier.c_str(), hashDirectory);
             }  else  {
                 cout << "Input command not found" << endl;
             }
