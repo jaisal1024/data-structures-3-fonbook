@@ -44,7 +44,7 @@ void load(const char* fileName, HashDirectory* hashDirectory) {
     if (opened)
         cout << "File loaded successfully" << endl;
     else
-        cerr << "Error: " << strerror(errno);
+        cerr << "Error: " << strerror(errno) << endl;
 }
 void dump(const char* file, HashDirectory* hashDirectory) {
     if (hashDirectory->dump(file))

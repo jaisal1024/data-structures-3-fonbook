@@ -23,6 +23,7 @@ protected:
     int index;
     bool isFull;
     int bucketSize;
+    int accessNumber;
 
 public:
     Buckets();
@@ -34,7 +35,7 @@ protected:
     bool remove(string key);
     bool insert(Entry* entryIn);
     bool isEmpty();
-    int getIndex();
+    void initialize(int bucketSizeIn);
     void printBucket();
     void getBucketContents(vector<string>& contentBuckets);
 
@@ -46,7 +47,6 @@ private:
 
 class HashDirectory {
 private:
-    double loadFactor;
     int capacity, size, bucketSize;
     Buckets* hashArray;
 

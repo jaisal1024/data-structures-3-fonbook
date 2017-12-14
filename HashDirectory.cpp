@@ -7,13 +7,11 @@
 HashDirectory::HashDirectory() {
     capacity = 13;
     size = 0, bucketSize = 5;
-    loadFactor = 0;
     hashArray = new Buckets[capacity];
 }
 
 HashDirectory::HashDirectory(int capacityIn, int bucketSizeIn) {
     size = 0;
-    loadFactor = 0;
     if (capacityIn < 10)
         capacity = 13;
     else {
@@ -24,6 +22,9 @@ HashDirectory::HashDirectory(int capacityIn, int bucketSizeIn) {
         capacity = capacityIn;
     }
     hashArray = new Buckets[capacity];
+    for (int i = 0; i < capacity; ++i) {
+        hashArray[i].initialize(bucketSizeIn);
+    }
     bucketSize = bucketSizeIn;
 
 }
@@ -110,7 +111,18 @@ void HashDirectory::printTable() {
         hashArray[i].printBucket();
     }
 }
-void HashDirectory::printStats() {}
+void HashDirectory::printStats() {
+    double loadFactor = ((double)size)/capacity;
+    cout << "HASH STATISTICS" << endl;
+    cout << "Hash Directory - Load Factor : " << loadFactor << endl;
+    cout << "Bucket Number : " << "Capacity Used : " << "Number of Times Accessed" << endl;
+    for (int i = 0; i < capacity; i++) {
+        if (hashArray[i].isFull)
+            cout << i << "\t\t" << "Full\t\t" << hashArray[i].accessNumber << endl;
+        else
+            cout << i << "\t\t" << hashArray[i].index << "/" << hashArray[i].bucketSize << "\t\t" << hashArray[i].accessNumber << endl;
+    }
+}
 
 bool HashDirectory::dump(const char* fileName) {
     if (isEmpty()){
@@ -148,6 +160,7 @@ Buckets::Buckets() {
     index = 0;
     isFull = false;
     bucketSize = 5;
+    accessNumber = 0;
 }
 Buckets::Buckets(int bucketSizeIn) {
     bucketArray = new Entry[bucketSizeIn];
@@ -155,6 +168,7 @@ Buckets::Buckets(int bucketSizeIn) {
     prevChain = NULL;
     index = 0;
     isFull = false;
+    accessNumber = 0;
     bucketSize = bucketSizeIn;
 }
 Buckets::~Buckets() {
@@ -170,6 +184,7 @@ Buckets::~Buckets() {
 
 bool Buckets::insert(Entry* entryIn){
     //check it's not defined within the bucket already
+    accessNumber++;
     for (int i = 0; i < index; i++) {
         if (bucketArray[i].getValue().compare(entryIn->getValue()) == 0){
             cerr << "Warning: Cannot insert already defined entry" << endl;
@@ -194,6 +209,7 @@ bool Buckets::insert(Entry* entryIn){
         return false;
 }
 string Buckets::find(string key){
+    accessNumber++;
     bool found = false;
     for (int i = 0; i < index && !found; i++) {
         if (bucketArray[i].getKey().compare(key)==0) {
@@ -210,6 +226,7 @@ string Buckets::find(string key){
     }
 }
 bool Buckets::remove(string key){
+    accessNumber++;
     for (int i = 0; i < index; i++) {
         if (bucketArray[i].getKey().compare(key)==0) {
             cout << "Removed successfully : " << bucketArray[i].getValue() << endl;
@@ -246,8 +263,9 @@ bool Buckets::refactorOnRemove(int i) {
         return false;
 }
 bool Buckets::isEmpty(){ return index ==0;}
-int Buckets::getIndex(){ return index;}
+void Buckets::initialize(int bucketSizeIn){ bucketSize = bucketSizeIn;}
 void Buckets::printBucket() {
+    accessNumber++;
     if (index == 0) {
         return;
     }
@@ -258,6 +276,7 @@ void Buckets::printBucket() {
         nextChain->printBucket();
 }
 void Buckets::getBucketContents(vector<string> & bucketContents) {
+    accessNumber++;
     if (index == 0) {
         return;
     }
