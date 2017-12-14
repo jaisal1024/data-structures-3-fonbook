@@ -11,17 +11,25 @@ Entry::Entry() {
 }
 Entry::Entry(string valueIn) {
     value = valueIn;
-    bool foundWhiteSpace = false;
-    for (int i = 0; i < valueIn.size(); ++i) {
-        if (valueIn.substr(i,1) == " " && !foundWhiteSpace)
-            foundWhiteSpace = true;
-        else if (valueIn.substr(i,1) == " " && foundWhiteSpace)
+    bool foundWhiteSpaceOne = false, foundWhiteSpaceTwo = false;
+    int indexLastName = -1;
+    for (int i = 0; i < valueIn.size(); i++) {
+        if (valueIn.substr(i,1) == " " && !foundWhiteSpaceOne) {
+            foundWhiteSpaceOne = true;
             key = valueIn.substr(0,i);
+            indexLastName = i+1;
+        } else if (valueIn.substr(i,1) == " " && foundWhiteSpaceOne && !foundWhiteSpaceTwo) {
+            key = key + valueIn.substr(indexLastName, i - indexLastName);
+            foundWhiteSpaceTwo = true;
+        } else if (foundWhiteSpaceTwo) {
+            break;
+        }
+         continue;
     }
     hash = computeHash();
 }
 int Entry::computeHash() {
-    int hashCode = 5381;
+    int hashCode = 10;
     int c;
 
     //djb2

@@ -5,12 +5,17 @@
 #include "HashDirectory.h"
 
 HashDirectory::HashDirectory() {
+    capacity = 13;
+    size = 0, bucketSize = 5;
+    loadFactor = 0;
     hashArray = new Buckets[capacity];
 }
 
 HashDirectory::HashDirectory(int capacityIn, int bucketSizeIn) {
-    if (capacityIn > capacity)
-        capacity = capacityIn;
+    size = 0;
+    loadFactor = 0;
+    if (capacityIn < 10)
+        capacity = 13;
     else {
         //compute smallest prime number greater than capacityIn
         while (!is_prime(capacityIn)) {
@@ -34,11 +39,16 @@ bool HashDirectory::is_prime(int num) {
 }
 
 HashDirectory::~HashDirectory() {
+//    for (int i = 0; i < capacity; ++i) {
+//        if (hashArray[i].isEmpty())
+//            continue;
+//        hashArray[i].~Buckets();
+//    }
     delete [] hashArray;
 }
 
 int HashDirectory::computeHash(string key) {
-    int hashCode = 5381;
+    int hashCode = 10;
     int c;
 
     //djb2
@@ -58,34 +68,47 @@ int HashDirectory::computeHash(string key) {
 
 
 int HashDirectory::find_index(string key) {
-   int h = computeHash(key) % capacity;
+    int h = computeHash(key) % capacity;
     return h;
 }
 
 bool HashDirectory::insert(Entry* entryIn) {
-    int index = find_index(entryIn->getKey());
+    int index = entryIn->getHash() % capacity;
     if (index == -1) {
         return false;
     }
-    return hashArray[index].insert(entryIn);
+    bool status = hashArray[index].insert(entryIn);
+    if (status) {
+        size++;
+        return true;
+    }
+    return false;
 }
 bool HashDirectory::remove(string key) {
     int index = find_index(key);
-    if (index == -1)
+    if (index == -1 || hashArray[index].isEmpty()) {
+        cerr << "Search for " << key << " not found - Remove not possible" << endl;
         return false;
-
+    }
     return hashArray[index].remove(key);
 }
 string HashDirectory::find(string key) {
     int index = find_index(key);
-    if (index == -1)
+    if (index == -1 || hashArray[index].isEmpty()) {
+        cerr << "Search for " << key << " not found" << endl;
         return "";
-
+    }
     return hashArray[index].find(key);
-
 }
 void HashDirectory::printTable() {
-
+    if (isEmpty())
+        return;
+    cout << setw(20) << "\nE-Phonebook Directory: \n " << endl;
+    for (int i = 0; i < capacity; ++i) {
+        if (hashArray[i].isEmpty())
+            continue;
+        hashArray[i].printBucket();
+    }
 }
 void HashDirectory::printStats() {}
 
@@ -93,6 +116,7 @@ void HashDirectory::printStats() {}
 Buckets::Buckets() {
     bucketArray = new Entry[5];
     nextChain = NULL;
+    prevChain = NULL;
     index = 0;
     isFull = false;
     bucketSize = 5;
@@ -100,6 +124,7 @@ Buckets::Buckets() {
 Buckets::Buckets(int bucketSizeIn) {
     bucketArray = new Entry[bucketSizeIn];
     nextChain = NULL;
+    prevChain = NULL;
     index = 0;
     isFull = false;
     bucketSize = bucketSizeIn;
@@ -112,25 +137,96 @@ Buckets::~Buckets() {
         bucketNext = bucketCurr->nextChain;
         delete bucketCurr;
     }
+    delete prevChain;
 }
 
 bool Buckets::insert(Entry* entryIn){
+    //check it's not defined within the bucket already
+    for (int i = 0; i < index; i++) {
+        if (bucketArray[i].getValue().compare(entryIn->getValue()) == 0){
+            cerr << "Warning: Cannot insert already defined entry" << endl;
+            return false;
+
+        }
+    }
     if (!isFull) {
         bucketArray[index++] = *entryIn;
         if (index == bucketSize) {
+            cout << "Create: bucket chain " << endl;
             Buckets* nextBucket = new Buckets(bucketSize);
             nextChain = nextBucket;
+            nextBucket->prevChain = this;
             isFull = true;
         }
-        cout << "INSERTED :" << entryIn->getValue() << endl;
         return true;
     }
     else if (nextChain!=NULL) {
        nextChain->insert(entryIn);
-    }
-    return false;
+    } else
+        return false;
 }
-string Buckets::find(string key){}
-bool Buckets::remove(string key){}
+string Buckets::find(string key){
+    bool found = false;
+    for (int i = 0; i < index && !found; i++) {
+        if (bucketArray[i].getKey().compare(key)==0) {
+            found = true;
+            return bucketArray[i].getValue();
+        }
+    }
+    if ((found == false && !isFull)) {
+        cerr << "Search for " << key << " not found" << endl;
+        return "";
+    }
+    if (isFull){
+        return nextChain->find(key);
+    }
+}
+bool Buckets::remove(string key){
+    for (int i = 0; i < index; i++) {
+        if (bucketArray[i].getKey().compare(key)==0) {
+            cout << "Removed successfully : " << bucketArray[i].getValue() << endl;
+            return refactorOnRemove(i);
+        }
+    }
+    if (!isFull) {
+        cerr << "Search for " << key << " not found - Remove not possible" << endl;
+        return false;
+    } else {
+        return nextChain->remove(key);
+    }
+}
+bool Buckets::refactorOnRemove(int i) {
+    if (i < bucketSize -1){
+        if (i == index-1) //if the found element is the last in the bucketArray
+            index--;
+        else { //shift bucketArray to accommodate remove function
+            for (int j = i; j < bucketSize - 1; ++j) {
+                if (bucketArray[j + 1].getKey().length() != 0) {
+                    bucketArray[j] = bucketArray[j + 1];
+                } else {
+                    break;
+                }
+            }
+            index--;
+        }
+        return true;
+    } else if (i == bucketSize -1){
+        index--;
+        isFull = false;
+        return true;
+    } else
+        return false;
+}
 bool Buckets::isEmpty(){ return index ==0;}
 int Buckets::getIndex(){ return index;}
+void Buckets::printBucket() {
+    if (index == 0) {
+        return;
+    }
+    for (int i = 0; i < index; i++) {
+        cout << setw(10) << bucketArray[i].getValue()  << endl;
+    }
+    if (isFull)
+        nextChain->printBucket();
+}
+
