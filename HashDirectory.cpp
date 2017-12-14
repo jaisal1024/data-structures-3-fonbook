@@ -7,13 +7,13 @@
 HashDirectory::HashDirectory() {
     capacity = 13;
     size = 0, bucketSize = 5;
-    hashArray = new Buckets[capacity];
+    hashArray = new Buckets[capacity]; //initialize array
 }
 
 HashDirectory::HashDirectory(int capacityIn, int bucketSizeIn) {
     size = 0;
-    if (capacityIn < 10)
-        capacity = 13;
+    if (capacityIn < 10) //check capacity is at least 10
+        capacity = 11; //assign smallest larger prime number
     else {
         //compute smallest prime number greater than capacityIn
         while (!is_prime(capacityIn)) {
@@ -22,14 +22,14 @@ HashDirectory::HashDirectory(int capacityIn, int bucketSizeIn) {
         capacity = capacityIn;
     }
     hashArray = new Buckets[capacity];
-    for (int i = 0; i < capacity; ++i) {
+    for (int i = 0; i < capacity; ++i) { //initialize each bucket to be of size bucketSize
         hashArray[i].initialize(bucketSizeIn);
     }
     bucketSize = bucketSizeIn;
 
 }
 
-bool HashDirectory::is_prime(int num) {
+bool HashDirectory::is_prime(int num) { //helper function for computing smallest larger prime number
     int sq_root = (int)sqrt(num);
     for (int i = 2; i <= sq_root; i++) {
         if (num % i == 0) {
@@ -37,9 +37,10 @@ bool HashDirectory::is_prime(int num) {
         }
         return true;
     }
+    return false;
 }
 
-HashDirectory::~HashDirectory() {
+HashDirectory::~HashDirectory() { //release main memory structure
 //    for (int i = 0; i < capacity; ++i) {
 //        if (hashArray[i].isEmpty())
 //            continue;
@@ -51,12 +52,6 @@ HashDirectory::~HashDirectory() {
 int HashDirectory::computeHash(string key) {
     int hashCode = 10;
     int c;
-
-    //djb2
-//    for (int i = 0; i < key.length(); ++i) {
-//        c = (int) key[i];
-//        hashCode = ((hashCode << 5) + hashCode) + c;
-//    }
 
     //Simple hashing
     for (int j = 0; j < key.length(); ++j) {
@@ -73,7 +68,7 @@ int HashDirectory::find_index(string key) {
     return h;
 }
 
-bool HashDirectory::insert(Entry* entryIn) {
+bool HashDirectory::insert(Entry* entryIn) { //insert element
     int index = entryIn->getHash() % capacity;
     if (index == -1) {
         return false;
@@ -85,7 +80,7 @@ bool HashDirectory::insert(Entry* entryIn) {
     }
     return false;
 }
-bool HashDirectory::remove(string key) {
+bool HashDirectory::remove(string key) { //remove element
     int index = find_index(key);
     if (index == -1 || hashArray[index].isEmpty()) {
         cerr << "Search for " << key << " not found - Remove not possible" << endl;
@@ -93,7 +88,7 @@ bool HashDirectory::remove(string key) {
     }
     return hashArray[index].remove(key);
 }
-string HashDirectory::find(string key) {
+string HashDirectory::find(string key) { //find element
     int index = find_index(key);
     if (index == -1 || hashArray[index].isEmpty()) {
         cerr << "Search for " << key << " not found" << endl;
@@ -101,22 +96,24 @@ string HashDirectory::find(string key) {
     }
     return hashArray[index].find(key);
 }
-void HashDirectory::printTable() {
+void HashDirectory::printTable() { //print out table to cout
     if (isEmpty())
         return;
-    cout << setw(20) << "\nE-Phonebook Directory: \n " << endl;
+    cout << "\n\t\tE-Phonebook Directory: \n " << endl;
+    cout << "------------------------------------------------------------" << endl;
     for (int i = 0; i < capacity; ++i) {
         if (hashArray[i].isEmpty())
             continue;
         hashArray[i].printBucket();
     }
+    cout << "------------------------------------------------------------" << endl;
 }
-void HashDirectory::printStats() {
+void HashDirectory::printStats() { //print out stats to cout
     double loadFactor = ((double)size)/capacity;
     cout << "HASH STATISTICS" << endl;
     cout << "Hash Directory - Load Factor : " << loadFactor << endl;
     cout << "Bucket Number : " << "Capacity Used : " << "Number of Times Accessed" << endl;
-    for (int i = 0; i < capacity; i++) {
+    for (int i = 0; i < capacity; i++) { //create table of bucket information
         if (hashArray[i].isFull)
             cout << i << "\t\t" << "Full\t\t" << hashArray[i].accessNumber << endl;
         else
@@ -131,17 +128,17 @@ bool HashDirectory::dump(const char* fileName) {
     }
     bool opened = false;
     ofstream textFile;
-    textFile.open(fileName, ios::out);
+    textFile.open(fileName, ios::out); //open file for outstream
     if (textFile.is_open()){
         opened = true;
         for (int i = 0; i < capacity; ++i) {
             if (hashArray[i].isEmpty())
                 continue;
             else {
-                vector<string> bucketContents;
+                vector<string> bucketContents; //create a vector for storing the contents of each bucket
                 hashArray[i].getBucketContents(bucketContents);
                 for (int j = 0; j < bucketContents.size(); ++j) {
-                    textFile << bucketContents.at(j) << endl;
+                    textFile << bucketContents.at(j) << endl; //read each buckets contents to the file
                 }
             }
 
@@ -154,7 +151,6 @@ bool HashDirectory::dump(const char* fileName) {
 
 
 Buckets::Buckets() {
-    bucketArray = new Entry[5];
     nextChain = NULL;
     prevChain = NULL;
     index = 0;
@@ -179,7 +175,8 @@ Buckets::~Buckets() {
         bucketNext = bucketCurr->nextChain;
         delete bucketCurr;
     }
-    delete prevChain;
+    if (prevChain!= NULL)
+        delete prevChain;
 }
 
 bool Buckets::insert(Entry* entryIn){
@@ -194,8 +191,8 @@ bool Buckets::insert(Entry* entryIn){
     }
     if (!isFull) {
         bucketArray[index++] = *entryIn;
-        if (index == bucketSize) {
-            cout << "Create: bucket chain " << endl;
+        if (index == bucketSize) { //create an overflow bucket chain
+            cout << "Created: overflow bucket chain " << endl;
             Buckets* nextBucket = new Buckets(bucketSize);
             nextChain = nextBucket;
             nextBucket->prevChain = this;
@@ -240,7 +237,7 @@ bool Buckets::remove(string key){
         return nextChain->remove(key);
     }
 }
-bool Buckets::refactorOnRemove(int i) {
+bool Buckets::refactorOnRemove(int i) { //refactor bucket array upon removal at i
     if (i < bucketSize -1){
         if (i == index-1) //if the found element is the last in the bucketArray
             index--;
@@ -263,7 +260,10 @@ bool Buckets::refactorOnRemove(int i) {
         return false;
 }
 bool Buckets::isEmpty(){ return index ==0;}
-void Buckets::initialize(int bucketSizeIn){ bucketSize = bucketSizeIn;}
+void Buckets::initialize(int bucketSizeIn){ //set the bucketArray size to bucketSize given
+    bucketArray = new Entry[bucketSizeIn];
+    bucketSize = bucketSizeIn;
+}
 void Buckets::printBucket() {
     accessNumber++;
     if (index == 0) {
