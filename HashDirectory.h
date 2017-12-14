@@ -10,6 +10,8 @@
 #include "cmath"
 #include <iostream>
 #include <iomanip>
+#include <fstream>
+#include <vector>
 
 using namespace std;
 
@@ -21,6 +23,7 @@ protected:
     int index;
     bool isFull;
     int bucketSize;
+    int accessNumber;
 
 public:
     Buckets();
@@ -32,8 +35,9 @@ protected:
     bool remove(string key);
     bool insert(Entry* entryIn);
     bool isEmpty();
-    int getIndex();
+    void initialize(int bucketSizeIn);
     void printBucket();
+    void getBucketContents(vector<string>& contentBuckets);
 
 private:
     bool refactorOnRemove(int i);
@@ -43,7 +47,6 @@ private:
 
 class HashDirectory {
 private:
-    double loadFactor;
     int capacity, size, bucketSize;
     Buckets* hashArray;
 
@@ -64,6 +67,7 @@ public:
     string find(string key);
     void printTable();
     void printStats();
+    bool dump(const char*);
 };
 
 

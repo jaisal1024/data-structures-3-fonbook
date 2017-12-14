@@ -13,36 +13,28 @@ Entry::Entry(string valueIn) {
     value = valueIn;
     bool foundWhiteSpaceOne = false, foundWhiteSpaceTwo = false;
     int indexLastName = -1;
-    for (int i = 0; i < valueIn.size(); i++) {
-        if (valueIn.substr(i,1) == " " && !foundWhiteSpaceOne) {
+    for (int i = 0;
+         i < valueIn.size() && !foundWhiteSpaceTwo; i++) { //look for first and second white space to find key
+        if (valueIn.substr(i, 1) == " " && !foundWhiteSpaceOne) {
             foundWhiteSpaceOne = true;
-            key = valueIn.substr(0,i);
-            indexLastName = i+1;
-        } else if (valueIn.substr(i,1) == " " && foundWhiteSpaceOne && !foundWhiteSpaceTwo) {
-            key = key + valueIn.substr(indexLastName, i - indexLastName);
+            key = valueIn.substr(0, i); //key is equal to first name
+            indexLastName = i + 1; //store index for start of last name
+        } else if (valueIn.substr(i, 1) == " " && foundWhiteSpaceOne && !foundWhiteSpaceTwo) {
+            key = key +
+                  valueIn.substr(indexLastName, i - indexLastName); //key is equal to the first name + last name found
             foundWhiteSpaceTwo = true;
-        } else if (foundWhiteSpaceTwo) {
-            break;
         }
-         continue;
+        hash = computeHash();
     }
-    hash = computeHash();
 }
 int Entry::computeHash() {
     int hashCode = 10;
     int c;
 
-    //djb2
-//    for (int i = 0; i < key.length(); ++i) {
-//        c = (int) key[i];
-//        hashCode = ((hashCode << 5) + hashCode) + c;
-//    }
-
-    //Simple hashing
+    //Simple hashing function
     for (int j = 0; j < key.length(); ++j) {
         c = (int) key[j];
         hashCode += (j+1)*c;
-
     }
     return hashCode;
 }
